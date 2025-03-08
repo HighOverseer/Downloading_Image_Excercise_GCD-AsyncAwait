@@ -82,9 +82,11 @@ extension ViewController: UITableViewDataSource, UIScrollViewDelegate {
                 cell.indicatorLoading.isHidden = true
             }
             
+        
             return cell
             
         }else{
+            
             return UITableViewCell()
         }
     }
