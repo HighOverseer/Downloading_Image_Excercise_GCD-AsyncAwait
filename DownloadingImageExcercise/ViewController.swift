@@ -33,11 +33,13 @@ class ViewController: UIViewController{
                     movie.state = .downloaded
                     movie.image = image
                     self.movieTableView.reloadRows(at: [indexPath], with: .automatic)
+                    print("done")
                 }catch {
                     movie.state = .failed
                     movie.image = nil
                 }
             }
+    
         }
         
     }
