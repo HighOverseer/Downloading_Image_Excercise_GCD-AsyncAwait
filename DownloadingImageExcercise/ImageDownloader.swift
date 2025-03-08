@@ -8,33 +8,12 @@
 import Foundation
 import UIKit
 
-class ImageDownloader:Operation{
+class ImageDownloader{
     
-    private let movie:Movie
-    
-    init(movie:Movie){
-        self.movie = movie
+    func downloadImage(url:URL) async throws -> UIImage {
+        async let data = try Data(contentsOf: url)
+        return UIImage(data: try await data)!
     }
     
-    override func main(){
-        if isCancelled{
-            return
-        }
-        
-        guard let imageData = try? Data(contentsOf: self.movie.poster) else{
-            return
-        }
-        
-        if isCancelled{
-            return
-        }
-        
-        if (!imageData.isEmpty){
-            movie.image = UIImage(data: imageData)
-            movie.state = .downloaded
-        }else{
-            movie.image = nil
-            movie.state = .failed
-        }
-    }
+    
 }

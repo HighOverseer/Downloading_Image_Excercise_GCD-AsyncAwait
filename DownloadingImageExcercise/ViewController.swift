@@ -11,9 +11,7 @@ class ViewController: UIViewController{
    
 
     @IBOutlet weak var movieTableView: UITableView!
-    
-    private let pendingOperations = PendingOperations()
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -22,38 +20,28 @@ class ViewController: UIViewController{
         
         movieTableView.dataSource = self
     }
-    
-    fileprivate func startOperations(movie:Movie, indexPath:IndexPath){
-        if movie.state == .new{
-            startDownload(movie: movie, indexPath: indexPath)
-        }
-    }
+
     
     fileprivate func startDownload(movie:Movie, indexPath:IndexPath){
-        guard pendingOperations.downloadInProgress[indexPath] == nil else{
-            return
+        
+        let imageDownloader = ImageDownloader()
+        
+        if (movie.state == .new){
+            Task{
+                do{
+                    let image = try await imageDownloader.downloadImage(url: movie.poster)
+                    movie.state = .downloaded
+                    movie.image = image
+                    self.movieTableView.reloadRows(at: [indexPath], with: .automatic)
+                }catch {
+                    movie.state = .failed
+                    movie.image = nil
+                }
+            }
         }
         
-        let imageDownloader = ImageDownloader(movie: movie)
-        
-        imageDownloader.completionBlock = {
-            if imageDownloader.isCancelled{
-                return
-            }
-            
-            DispatchQueue.main.async {
-                self.pendingOperations.downloadInProgress.removeValue(forKey: indexPath)
-                self.movieTableView.reloadRows(at: [indexPath], with: .automatic)
-            }
-        }
-        
-        self.pendingOperations.downloadInProgress[indexPath] = imageDownloader
-        self.pendingOperations.downloadQueue.addOperation(imageDownloader)
     }
-    
-    fileprivate func toggleSuspendOperations(isSuspended:Bool){
-        pendingOperations.downloadQueue.isSuspended = isSuspended
-    }
+
 
 }
 
@@ -76,7 +64,7 @@ extension ViewController: UITableViewDataSource, UIScrollViewDelegate {
             if movie.state == .new{
                 cell.indicatorLoading.isHidden = false
                 cell.indicatorLoading.startAnimating()
-                startOperations(movie: movie, indexPath: indexPath)
+                startDownload(movie: movie, indexPath: indexPath)
             }else{
                 cell.indicatorLoading.stopAnimating()
                 cell.indicatorLoading.isHidden = true
@@ -89,13 +77,5 @@ extension ViewController: UITableViewDataSource, UIScrollViewDelegate {
             
             return UITableViewCell()
         }
-    }
-    
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        toggleSuspendOperations(isSuspended: true)
-    }
-    
-    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        toggleSuspendOperations(isSuspended: false)
     }
 }
