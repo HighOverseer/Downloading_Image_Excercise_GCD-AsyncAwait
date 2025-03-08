@@ -12,8 +12,8 @@ class ViewController: UIViewController{
 
     @IBOutlet weak var movieTableView: UITableView!
     
-    private let pendingOperations = PendingOperations()
-    
+    private var movies : [Movie] = []
+
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -22,38 +22,46 @@ class ViewController: UIViewController{
         
         movieTableView.dataSource = self
     }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        Task{await getMovies()}
+    }
     
-    fileprivate func startOperations(movie:Movie, indexPath:IndexPath){
-        if movie.state == .new{
-            startDownload(movie: movie, indexPath: indexPath)
+    func getMovies() async {
+        let network = NetwokService()
+        
+        do{
+            movies = try await network.getMovies()
+            movieTableView.reloadData()
+        }catch{
+            fatalError("Error connection failed")
         }
     }
     
     fileprivate func startDownload(movie:Movie, indexPath:IndexPath){
-        guard pendingOperations.downloadInProgress[indexPath] == nil else{
-            return
-        }
         
-        let imageDownloader = ImageDownloader(movie: movie)
+        let imageDownloader = ImageDownloader()
         
-        imageDownloader.completionBlock = {
-            if imageDownloader.isCancelled{
-                return
+        if (movie.state == .new){
+            Task{
+                do{
+                    let image = try await imageDownloader.downloadImage(url: movie.posterPath)
+                    movie.state = .downloaded
+                    movie.image = image
+                    self.movieTableView.reloadRows(at: [indexPath], with: .automatic)
+              
+                }catch {
+                    movie.state = .failed
+                    movie.image = nil
+                }
             }
-            
-            DispatchQueue.main.async {
-                self.pendingOperations.downloadInProgress.removeValue(forKey: indexPath)
-                self.movieTableView.reloadRows(at: [indexPath], with: .automatic)
-            }
-        }
-        
-        self.pendingOperations.downloadInProgress[indexPath] = imageDownloader
-        self.pendingOperations.downloadQueue.addOperation(imageDownloader)
-    }
     
-    fileprivate func toggleSuspendOperations(isSuspended:Bool){
-        pendingOperations.downloadQueue.isSuspended = isSuspended
+        }
+        
     }
+
 
 }
 
@@ -76,24 +84,18 @@ extension ViewController: UITableViewDataSource, UIScrollViewDelegate {
             if movie.state == .new{
                 cell.indicatorLoading.isHidden = false
                 cell.indicatorLoading.startAnimating()
-                startOperations(movie: movie, indexPath: indexPath)
+                startDownload(movie: movie, indexPath: indexPath)
             }else{
                 cell.indicatorLoading.stopAnimating()
                 cell.indicatorLoading.isHidden = true
             }
             
+        
             return cell
             
         }else{
+            
             return UITableViewCell()
         }
-    }
-    
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        toggleSuspendOperations(isSuspended: true)
-    }
-    
-    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        toggleSuspendOperations(isSuspended: false)
     }
 }

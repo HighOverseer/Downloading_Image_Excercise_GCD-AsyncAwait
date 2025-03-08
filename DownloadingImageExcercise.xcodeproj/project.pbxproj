@@ -33,7 +33,7 @@
 		1F69BB962D7B51F200D4FCD9 /* Exceptions for "DownloadingImageExcercise" folder in "DownloadingImageExcercise" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Info.plist,
+				FileSystem/Info.plist,
 			);
 			target = 1F69BB6D2D7B51F100D4FCD9 /* DownloadingImageExcercise */;
 		};
@@ -290,7 +290,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = DownloadingImageExcercise/Info.plist;
+				INFOPLIST_FILE = DownloadingImageExcercise/FileSystem/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -317,7 +317,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = DownloadingImageExcercise/Info.plist;
+				INFOPLIST_FILE = DownloadingImageExcercise/FileSystem/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
