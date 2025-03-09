@@ -32,7 +32,7 @@
                     </view>
                     <navigationItem key="navigationItem" title="Popular Movies" id="vbC-bD-Zsy"/>
                     <connections>
-                        <outlet property="movieTableView" destination="YUo-bT-x3p" id="qX6-t0-6gw"/>
+                        <outlet property="movieTableView" destination="YUo-bT-x3p" id="Dwo-eN-nSM"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>

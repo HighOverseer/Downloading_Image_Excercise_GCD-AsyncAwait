@@ -1,4 +1,3 @@
-
 <?xml version="1.0"?>
 <movies>
   <movie id="610150">
@@ -27,3 +26,4 @@
     <poster>/pIkRyD18kl4FhoCNQuWxWu5cBLM.jpg</poster>
   </movie>
 </movies>
+<!--Do not have even a empty line/space at the top of this file, if you do, it wont parse the xml, maybe because the parser can parse the empty line?-->
